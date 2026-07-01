@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/api/auth/**
+        - id: room-service
+          uri: http://room-service:8082
+          predicates:
+            - Path=/api/rooms/**,/api/presence/**
+        - id: realtime-service
+          uri: http://realtime-service:8083
+          predicates:
+            - Path=/api/realtime/**,/ws/**
+        - id: reporting-service
+          uri: http://reporting-service:8084
+          predicates:
+            - Path=/api/reports/**,/api/dashboard/**,/api/kpis/**
+        - id: observability-service
+          uri: http://observability-service:8085
+          predicates:
+            - Path=/api/observability/**
+
+orcalab:
+  jwt:
+    secret: ${JWT_SECRET:change-me-for-local-development}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always

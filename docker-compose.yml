@@ -1,0 +1,162 @@
+services:
+  auth-service:
+    build:
+      context: .
+    container_name: auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - '8081:8081'
+    depends_on:
+      - postgres-auth
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - '8080:8080'
+    depends_on:
+      - auth-service
+      - room-service
+      - realtime-service
+      - reporting-service
+      - observability-service
+
+  room-service:
+    build:
+      context: ./room-service
+    container_name: room-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - '8082:8082'
+    depends_on:
+      - postgres-room
+      - redis
+
+  realtime-service:
+    build:
+      context: ./realtime-service
+    container_name: realtime-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - '8083:8083'
+    depends_on:
+      - mongodb
+      - redis
+
+  reporting-service:
+    build:
+      context: ./reporting-service
+    container_name: reporting-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - '8084:8084'
+    depends_on:
+      - postgres-reporting
+
+  observability-service:
+    build:
+      context: ./observability-service
+    container_name: observability-service
+    ports:
+      - '8085:8085'
+    depends_on:
+      - auth-service
+      - api-gateway
+      - room-service
+      - realtime-service
+      - reporting-service
+
+  postgres-auth:
+    image: postgres:16-alpine
+    container_name: postgres-auth
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+
+  postgres-room:
+    image: postgres:16-alpine
+    container_name: postgres-room
+    environment:
+      POSTGRES_DB: ${ROOM_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '5434:5432'
+    volumes:
+      - postgres_room_data:/var/lib/postgresql/data
+
+  postgres-reporting:
+    image: postgres:16-alpine
+    container_name: postgres-reporting
+    environment:
+      POSTGRES_DB: ${REPORTING_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '5435:5432'
+    volumes:
+      - postgres_reporting_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    container_name: prometheus
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - '9090:9090'
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    container_name: grafana
+    ports:
+      - '3000:3000'
+    depends_on:
+      - prometheus
+
+  loki:
+    image: grafana/loki:3.1.1
+    container_name: loki
+    volumes:
+      - ./infra/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+    ports:
+      - '3100:3100'
+    command:
+      - -config.file=/etc/loki/loki-config.yml
+
+volumes:
+  postgres_auth_data:
+  postgres_room_data:
+  postgres_reporting_data:
+  mongodb_data:
