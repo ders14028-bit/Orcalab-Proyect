@@ -1,0 +1,79 @@
+_format_version: "3.0"
+_transform: true
+
+# Para alta disponibilidad futura, añade más targets bajo cada upstream.
+# Ejemplo: docker compose up --scale auth-service=2 y luego incorporar los nuevos endpoints aquí.
+
+upstreams:
+  - name: auth-service-upstream
+    algorithm: round-robin
+    targets:
+      - target: auth-service:8081
+        weight: 100
+  - name: room-service-upstream
+    algorithm: round-robin
+    targets:
+      - target: room-service:8082
+        weight: 100
+  - name: realtime-service-upstream
+    algorithm: round-robin
+    targets:
+      - target: realtime-service:8083
+        weight: 100
+  - name: reporting-service-upstream
+    algorithm: round-robin
+    targets:
+      - target: reporting-service:8084
+        weight: 100
+  - name: observability-service-upstream
+    algorithm: round-robin
+    targets:
+      - target: observability-service:8085
+        weight: 100
+
+services:
+  - name: auth-service
+    host: auth-service-upstream
+    port: 8081
+    protocol: http
+    routes:
+      - name: auth-service-route
+        paths:
+          - /api/auth
+        strip_path: true
+  - name: room-service
+    host: room-service-upstream
+    port: 8082
+    protocol: http
+    routes:
+      - name: room-service-route
+        paths:
+          - /api/rooms
+        strip_path: true
+  - name: realtime-service
+    host: realtime-service-upstream
+    port: 8083
+    protocol: http
+    routes:
+      - name: realtime-service-route
+        paths:
+          - /api/realtime
+        strip_path: true
+  - name: reporting-service
+    host: reporting-service-upstream
+    port: 8084
+    protocol: http
+    routes:
+      - name: reporting-service-route
+        paths:
+          - /api/reports
+        strip_path: true
+  - name: observability-service
+    host: observability-service-upstream
+    port: 8085
+    protocol: http
+    routes:
+      - name: observability-service-route
+        paths:
+          - /api/observability
+        strip_path: true

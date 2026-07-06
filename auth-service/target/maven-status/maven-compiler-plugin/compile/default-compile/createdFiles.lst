@@ -1,0 +1,6 @@
+com\orcalab\auth\service\package-info.class
+com\orcalab\auth\repository\package-info.class
+com\orcalab\auth\controller\package-info.class
+com\orcalab\auth\AuthServiceApplication.class
+com\orcalab\auth\config\package-info.class
+com\orcalab\auth\model\package-info.class
