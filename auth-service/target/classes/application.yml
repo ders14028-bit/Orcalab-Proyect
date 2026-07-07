@@ -5,13 +5,13 @@ spring:
   application:
     name: auth-service
   datasource:
-    url: jdbc:postgresql://auth-db:5432/auth_db
+    url: jdbc:postgresql://localhost:5433/auth_db
     username: auth_user
     password: auth_password
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     open-in-view: false
     properties:
       hibernate:
@@ -30,5 +30,6 @@ management:
 app:
   security:
     jwt:
-      secret: change-me-in-local-dev
-      expiration-ms: 86400000
+      secret: ${JWT_SECRET:orcalab-dev-secret-cambiar-en-produccion-minimo-256-bits-de-largo}
+      expiration-ms: ${JWT_EXPIRATION_MS:86400000}  # 24 horas
+      

@@ -13,10 +13,10 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
+    @Value("${app.security.jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration-ms}")
+    @Value("${app.security.jwt.expiration-ms}")
     private long expirationMs;
 
     private SecretKey getSigningKey() {
