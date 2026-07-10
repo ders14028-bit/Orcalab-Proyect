@@ -1,103 +1,11 @@
+x-jwt-secret: &jwt-secret "orcalab-dev-secret-cambiar-en-produccion-minimo-256-bits-de-largo"
+
 services:
-  auth-service:
-    build:
-      context: ./auth-service
-    container_name: auth-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth_db
-      SPRING_DATASOURCE_USERNAME: auth_user
-      SPRING_DATASOURCE_PASSWORD: auth_password
-      APP_SECURITY_JWT_SECRET: change-me-in-local-dev
-      APP_SECURITY_JWT_EXPIRATION_MS: "86400000"
-    ports:
-      - "8081:8081"
-    depends_on:
-      auth-db:
-        condition: service_healthy
-
-  room-service:
-    build:
-      context: ./room-service
-    container_name: room-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://room-db:5432/room_db
-      SPRING_DATASOURCE_USERNAME: room_user
-      SPRING_DATASOURCE_PASSWORD: room_password
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: "6379"
-    ports:
-      - "8082:8082"
-    depends_on:
-      room-db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-
-  realtime-service:
-    build:
-      context: ./realtime-service
-    container_name: realtime-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: "6379"
-    ports:
-      - "8083:8083"
-    depends_on:
-      redis:
-        condition: service_started
-
-  reporting-service:
-    build:
-      context: ./reporting-service
-    container_name: reporting-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/reporting_db
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: "6379"
-    ports:
-      - "8084:8084"
-    depends_on:
-      mongo:
-        condition: service_started
-      redis:
-        condition: service_started
-
-  observability-service:
-    build:
-      context: ./observability-service
-    container_name: observability-service
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - "8085:8085"
-
-  kong:
-    image: kong:latest
-    container_name: kong
-    environment:
-      KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
-      KONG_PROXY_LISTEN: 0.0.0.0:8000
-      KONG_ADMIN_LISTEN: 0.0.0.0:8001
-      KONG_LOG_LEVEL: info
-    volumes:
-      - ./api-gateway/kong.yml:/etc/kong/kong.yml:ro
-    ports:
-      - "8000:8000"
-      - "8001:8001"
-    depends_on:
-      - auth-service
-      - room-service
-      - realtime-service
-      - reporting-service
-      - observability-service
-
+  # ---------------------------------------------------------------------
+  # Bases de datos + Redis
+  # ---------------------------------------------------------------------
   auth-db:
-    image: postgres:16-alpine
+    image: postgres:16
     container_name: auth-db
     environment:
       POSTGRES_DB: auth_db
@@ -109,12 +17,13 @@ services:
       - auth-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 10
+    networks: [orcalab-net]
 
   room-db:
-    image: postgres:16-alpine
+    image: postgres:16
     container_name: room-db
     environment:
       POSTGRES_DB: room_db
@@ -126,48 +35,206 @@ services:
       - room-db-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U room_user -d room_db"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 10
-
-  mongo:
-    image: mongo:7
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
+    networks: [orcalab-net]
 
   redis:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [orcalab-net]
 
+  realtime-mongo:
+    image: mongo:7
+    container_name: realtime-mongo
+    ports:
+      - "27019:27017"
+    volumes:
+      - realtime-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [orcalab-net]
+
+  reporting-mongo:
+    image: mongo:7
+    container_name: reporting-mongo
+    ports:
+      - "27020:27017"
+    volumes:
+      - reporting-mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [orcalab-net]
+
+  # ---------------------------------------------------------------------
+  # Microservicios Spring Boot
+  # ---------------------------------------------------------------------
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    environment:
+      DB_HOST: auth-db
+      DB_PORT: "5432"
+      DB_USERNAME: auth_user
+      DB_PASSWORD: auth_password
+      JWT_SECRET: *jwt-secret
+    ports:
+      - "8081:8081"
+    volumes:
+      - auth-service-logs:/app/logs
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks: [orcalab-net]
+
+  room-service:
+    build:
+      context: ./room-service
+    container_name: room-service
+    environment:
+      DB_HOST: room-db
+      DB_PORT: "5432"
+      DB_USERNAME: room_user
+      DB_PASSWORD: room_password
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      JWT_SECRET: *jwt-secret
+    ports:
+      - "8082:8082"
+    volumes:
+      - room-service-logs:/app/logs
+    depends_on:
+      room-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [orcalab-net]
+
+  realtime-service:
+    build:
+      context: ./realtime-service
+    container_name: realtime-service
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      MONGO_HOST: realtime-mongo
+      MONGO_PORT: "27017"
+      JWT_SECRET: *jwt-secret
+    ports:
+      - "8083:8083"
+    volumes:
+      - realtime-service-logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+      realtime-mongo:
+        condition: service_healthy
+    networks: [orcalab-net]
+
+  reporting-service:
+    build:
+      context: ./reporting-service
+    container_name: reporting-service
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      MONGO_HOST: reporting-mongo
+      MONGO_PORT: "27017"
+      JWT_SECRET: *jwt-secret
+    ports:
+      - "8084:8084"
+    volumes:
+      - reporting-service-logs:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+      reporting-mongo:
+        condition: service_healthy
+    networks: [orcalab-net]
+
+  # ---------------------------------------------------------------------
+  # API Gateway
+  # ---------------------------------------------------------------------
+  kong:
+    image: kong:latest
+    container_name: kong
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
+      KONG_PROXY_LISTEN: "0.0.0.0:8000"
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001"
+      KONG_LOG_LEVEL: info
+    volumes:
+      - ./api-gateway/kong.yml:/etc/kong/kong.yml:ro
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    depends_on:
+      - auth-service
+      - room-service
+      - realtime-service
+      - reporting-service
+    networks: [orcalab-net]
+
+  # ---------------------------------------------------------------------
+  # Observabilidad (config fusionada desde observability-service/)
+  # ---------------------------------------------------------------------
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
+    volumes:
+      - ./observability-service/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
       - "9090:9090"
-    volumes:
-      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
+    depends_on:
+      - auth-service
+      - room-service
+      - realtime-service
+      - reporting-service
+    networks: [orcalab-net]
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:2.9.0
     container_name: loki
     command:
-      - -config.file=/etc/loki/loki-config.yml
+      - -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./observability-service/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
     ports:
       - "3100:3100"
+    networks: [orcalab-net]
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail
+    command:
+      - -config.file=/etc/promtail/config.yml
     volumes:
-      - ./infra/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
-      - loki-data:/loki
+      - ./observability-service/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - auth-service-logs:/var/log/orcalab/auth-service/logs
+      - room-service-logs:/var/log/orcalab/room-service/logs
+      - realtime-service-logs:/var/log/orcalab/realtime-service/logs
+      - reporting-service-logs:/var/log/orcalab/reporting-service/logs
+    depends_on:
+      - loki
+    networks: [orcalab-net]
 
   grafana:
     image: grafana/grafana:latest
@@ -180,14 +247,23 @@ services:
       - "3000:3000"
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./observability-service/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+      - loki
+    networks: [orcalab-net]
+
+networks:
+  orcalab-net:
+    driver: bridge
 
 volumes:
   auth-db-data:
   room-db-data:
-  mongo-data:
-  redis-data:
-  prometheus-data:
-  loki-data:
+  realtime-mongo-data:
+  reporting-mongo-data:
   grafana-data:
+  auth-service-logs:
+  room-service-logs:
+  realtime-service-logs:
+  reporting-service-logs:

@@ -77,3 +77,122 @@ java.lang.NullPointerException: Cannot invoke "java.lang.Double.doubleValue()" b
 2026-07-08 08:22:29 [http-nio-8084-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-07-08 08:22:29 [http-nio-8084-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
 2026-07-08 08:22:29 [http-nio-8084-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-07-08 09:25:24 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-08 09:25:24 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-07-08 09:25:33 [main] INFO  c.o.r.ReportingServiceApplication - Starting ReportingServiceApplication using Java 21.0.9 with PID 33720 (C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\reporting-service\target\classes started by ders1 in C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\reporting-service)
+2026-07-08 09:25:33 [main] INFO  c.o.r.ReportingServiceApplication - No active profile set, falling back to 1 default profile: "default"
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 95 ms. Found 3 MongoDB repository interfaces.
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.orcalab.reporting.repository.EventoActividadRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.orcalab.reporting.repository.ObservacionRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.orcalab.reporting.repository.SalaRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2026-07-08 09:25:34 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 7 ms. Found 0 Redis repository interfaces.
+2026-07-08 09:25:34 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8084 (http)
+2026-07-08 09:25:34 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-08 09:25:34 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.41]
+2026-07-08 09:25:34 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-08 09:25:34 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1228 ms
+2026-07-08 09:25:34 [main] INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "5.4.0"}, "os": {"type": "Windows", "name": "Windows 11", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/21.0.9+7-LTS-338"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=null, transportSettings=null, commandListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsCommandListener@44da7eb3], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@1d2def55, com.mongodb.Jep395RecordCodecProvider@274bae2c, com.mongodb.KotlinCodecProvider@6eeb29c0]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27020], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[io.micrometer.core.instrument.binder.mongodb.MongoMetricsConnectionPoolListener@7196a8f1], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2026-07-08 09:25:34 [cluster-ClusterId{value='6a4e5dde0e7fb8bebb500a6b', description='null'}-localhost:27020] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27020, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=21, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=15578100, minRoundTripTimeNanos=0}
+2026-07-08 09:25:34 [main] WARN  o.s.data.convert.CustomConversions - Registering converter from interface java.util.List to interface org.springframework.data.domain.Vector as reading converter although it doesn't convert from a store-supported type; You might want to check your annotation setup at the converter implementation
+2026-07-08 09:25:34 [main] WARN  o.s.data.convert.CustomConversions - Registering converter from interface java.util.List to interface org.springframework.data.domain.Vector as reading converter although it doesn't convert from a store-supported type; You might want to check your annotation setup at the converter implementation
+2026-07-08 09:25:35 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: f7cf7471-2047-49de-b1e0-78cf19d62c56
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-07-08 09:25:35 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-07-08 09:25:35 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+2026-07-08 09:25:35 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8084 (http) with context path '/'
+2026-07-08 09:25:35 [main] INFO  c.o.r.ReportingServiceApplication - Started ReportingServiceApplication in 2.742 seconds (process running for 2.988)
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 4
+2026-07-08 09:25:36 [scheduling-1] ERROR c.o.r.event.RealtimeEventConsumer - Error al procesar registro 1783389418161-0
+java.lang.NullPointerException: Cannot invoke "java.lang.Double.doubleValue()" because the return value of "com.orcalab.reporting.event.RealtimeEventoRecibido.getLatitud()" is null
+	at com.orcalab.reporting.event.RealtimeEventConsumer.aplicarEvento(RealtimeEventConsumer.java:78)
+	at com.orcalab.reporting.event.RealtimeEventConsumer.procesarRegistro(RealtimeEventConsumer.java:68)
+	at com.orcalab.reporting.event.RealtimeEventConsumer.consumirEventos(RealtimeEventConsumer.java:56)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124)
+	at io.micrometer.observation.Observation.observe(Observation.java:498)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124)
+	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:85)
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.runAndReset(FutureTask.java:358)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:305)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorEditado para sala 4
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: RutaTrazada para sala 4
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorEditado para sala 4
+2026-07-08 09:25:36 [scheduling-1] ERROR c.o.r.event.RealtimeEventConsumer - Error al procesar registro 1783390363289-0
+java.lang.NullPointerException: Cannot invoke "java.lang.Double.doubleValue()" because the return value of "com.orcalab.reporting.event.RealtimeEventoRecibido.getLatitud()" is null
+	at com.orcalab.reporting.event.RealtimeEventConsumer.aplicarEvento(RealtimeEventConsumer.java:78)
+	at com.orcalab.reporting.event.RealtimeEventConsumer.procesarRegistro(RealtimeEventConsumer.java:68)
+	at com.orcalab.reporting.event.RealtimeEventConsumer.consumirEventos(RealtimeEventConsumer.java:56)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124)
+	at io.micrometer.observation.Observation.observe(Observation.java:498)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124)
+	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:85)
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.runAndReset(FutureTask.java:358)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:305)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: AlertaGenerada para sala 4
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorAgregado para sala 4
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RoomEventConsumer - Evento de room-service aplicado: SalaCreada para sala 3
+2026-07-08 09:25:36 [scheduling-1] INFO  c.o.r.event.RoomEventConsumer - Evento de room-service aplicado: SalaCreada para sala 4
+2026-07-08 09:25:44 [http-nio-8084-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-08 09:25:44 [http-nio-8084-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-08 09:25:44 [http-nio-8084-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-07-08 09:28:21 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 1
+2026-07-08 09:28:24 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorAgregado para sala 1
+2026-07-08 09:30:46 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorAgregado para sala 1
+2026-07-08 09:32:02 [scheduling-1] INFO  c.o.r.event.RoomEventConsumer - Evento de room-service aplicado: SalaCreada para sala 5
+2026-07-08 09:32:26 [scheduling-1] INFO  c.o.r.event.RoomEventConsumer - Evento de room-service aplicado: SalaCreada para sala 6
+2026-07-08 09:35:25 [scheduling-1] INFO  c.o.r.event.RoomEventConsumer - Evento de room-service aplicado: UsuarioSeUnioASala para sala 6
+2026-07-08 09:36:09 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 6
+2026-07-08 09:36:14 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 6
+2026-07-08 09:36:24 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorAgregado para sala 6
+2026-07-08 09:38:05 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorAgregado para sala 6
+2026-07-08 09:38:05 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: AlertaGenerada para sala 6
+2026-07-08 09:45:19 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 6
+2026-07-08 09:45:25 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 6
+2026-07-08 09:45:43 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorAgregado para sala 6
+2026-07-08 09:45:43 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: AlertaGenerada para sala 6
+2026-07-08 10:30:52 [cluster-ClusterId{value='6a4e5dde0e7fb8bebb500a6b', description='null'}-localhost:27020] INFO  org.mongodb.driver.cluster - Exception in monitor thread while connecting to server localhost:27020
+com.mongodb.MongoSocketReadTimeoutException: Timeout while receiving message
+	at com.mongodb.internal.connection.InternalStreamConnection.createReadTimeoutException(InternalStreamConnection.java:819)
+	at com.mongodb.internal.connection.InternalStreamConnection.translateReadException(InternalStreamConnection.java:807)
+	at com.mongodb.internal.connection.InternalStreamConnection.receiveResponseBuffers(InternalStreamConnection.java:857)
+	at com.mongodb.internal.connection.InternalStreamConnection.receiveCommandMessageResponse(InternalStreamConnection.java:517)
+	at com.mongodb.internal.connection.InternalStreamConnection.receive(InternalStreamConnection.java:469)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitor.lookupServerDescription(DefaultServerMonitor.java:249)
+	at com.mongodb.internal.connection.DefaultServerMonitor$ServerMonitor.run(DefaultServerMonitor.java:176)
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.base/sun.nio.ch.NioSocketImpl.timedRead(NioSocketImpl.java:278)
+	at java.base/sun.nio.ch.NioSocketImpl.implRead(NioSocketImpl.java:304)
+	at java.base/sun.nio.ch.NioSocketImpl.read(NioSocketImpl.java:346)
+	at java.base/sun.nio.ch.NioSocketImpl$1.read(NioSocketImpl.java:796)
+	at java.base/java.net.Socket$SocketInputStream.read(Socket.java:1099)
+	at com.mongodb.internal.connection.SocketStream.read(SocketStream.java:182)
+	at com.mongodb.internal.connection.InternalStreamConnection.receiveResponseBuffers(InternalStreamConnection.java:824)
+	... 4 common frames omitted
+2026-07-08 10:30:52 [cluster-ClusterId{value='6a4e5dde0e7fb8bebb500a6b', description='null'}-localhost:27020] INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27020, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=21, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=282770000, minRoundTripTimeNanos=0}
+2026-07-08 11:05:50 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 6
+2026-07-08 11:05:55 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MensajeEnviado para sala 6
+2026-07-08 11:07:25 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: MarcadorAgregado para sala 6
+2026-07-08 11:07:25 [scheduling-1] INFO  c.o.r.event.RealtimeEventConsumer - Evento de realtime-service aplicado: AlertaGenerada para sala 6

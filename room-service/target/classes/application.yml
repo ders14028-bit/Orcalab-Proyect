@@ -5,9 +5,9 @@ spring:
   application:
     name: room-service
   datasource:
-    url: jdbc:postgresql://localhost:5434/room_db
-    username: room_user
-    password: room_password
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5434}/room_db
+    username: ${DB_USERNAME:room_user}
+    password: ${DB_PASSWORD:room_password}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -15,8 +15,8 @@ spring:
     open-in-view: false
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 management:
   endpoints:

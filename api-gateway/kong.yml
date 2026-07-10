@@ -1,8 +1,10 @@
 _format_version: "3.0"
 _transform: true
 
-# Para alta disponibilidad futura, añade más targets bajo cada upstream.
-# Ejemplo: docker compose up --scale auth-service=2 y luego incorporar los nuevos endpoints aquí.
+# Modo declarativo (DB-less). Para alta disponibilidad futura, añade mas
+# targets bajo cada upstream, ej:
+#   docker compose up --scale auth-service=2
+# y agrega el nuevo target (host:puerto del nuevo contenedor) a la lista.
 
 upstreams:
   - name: auth-service-upstream
@@ -25,11 +27,6 @@ upstreams:
     targets:
       - target: reporting-service:8084
         weight: 100
-  - name: observability-service-upstream
-    algorithm: round-robin
-    targets:
-      - target: observability-service:8085
-        weight: 100
 
 services:
   - name: auth-service
@@ -40,7 +37,8 @@ services:
       - name: auth-service-route
         paths:
           - /api/auth
-        strip_path: true
+        strip_path: false
+
   - name: room-service
     host: room-service-upstream
     port: 8082
@@ -48,17 +46,40 @@ services:
     routes:
       - name: room-service-route
         paths:
-          - /api/rooms
-        strip_path: true
+          - /api/salas
+        strip_path: false
+
+  # realtime-service atiende tanto los sub-recursos REST de /api/salas/{id}/...
+  # (mensajes, marcadores, rutas, alertas) como el endpoint WebSocket /ws.
+  # Se declaran rutas separadas y mas especificas que room-service-route para
+  # que Kong las matchee con prioridad (mayor cantidad de segmentos = mayor
+  # prioridad de regex/prefix en Kong).
   - name: realtime-service
     host: realtime-service-upstream
     port: 8083
     protocol: http
     routes:
-      - name: realtime-service-route
+      - name: realtime-mensajes-route
         paths:
-          - /api/realtime
-        strip_path: true
+          - "~/api/salas/[^/]+/mensajes"
+        strip_path: false
+      - name: realtime-marcadores-route
+        paths:
+          - "~/api/salas/[^/]+/marcadores"
+        strip_path: false
+      - name: realtime-rutas-route
+        paths:
+          - "~/api/salas/[^/]+/rutas"
+        strip_path: false
+      - name: realtime-alertas-route
+        paths:
+          - "~/api/salas/[^/]+/alertas"
+        strip_path: false
+      - name: realtime-ws-route
+        paths:
+          - /ws
+        strip_path: false
+
   - name: reporting-service
     host: reporting-service-upstream
     port: 8084
@@ -66,14 +87,5 @@ services:
     routes:
       - name: reporting-service-route
         paths:
-          - /api/reports
-        strip_path: true
-  - name: observability-service
-    host: observability-service-upstream
-    port: 8085
-    protocol: http
-    routes:
-      - name: observability-service-route
-        paths:
-          - /api/observability
-        strip_path: true
+          - /api/reportes
+        strip_path: false
