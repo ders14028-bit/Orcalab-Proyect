@@ -48,6 +48,14 @@ public class SalaEvento {
         return evento;
     }
 
+    public static SalaEvento salaEliminada(Long salaId, Long usuarioId) {
+        SalaEvento evento = new SalaEvento();
+        evento.tipo = "SalaEliminada";
+        evento.salaId = salaId;
+        evento.usuarioId = usuarioId;
+        return evento;
+    }
+
     // Getters (necesarios para que Jackson pueda serializar a JSON)
     public String getTipo() { return tipo; }
     public Long getSalaId() { return salaId; }

@@ -26,4 +26,10 @@ public class CanalController {
     public ResponseEntity<Canal> crear(@PathVariable Long salaId, @Valid @RequestBody CanalRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(canalService.crear(salaId, request));
     }
+
+    @DeleteMapping("/{canalId}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long salaId, @PathVariable String canalId) {
+        canalService.eliminar(salaId, canalId);
+        return ResponseEntity.noContent().build();
+    }
 }

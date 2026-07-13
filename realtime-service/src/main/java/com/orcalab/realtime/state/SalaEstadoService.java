@@ -48,4 +48,8 @@ public class SalaEstadoService {
     public boolean esLider(Long salaId, Long usuarioId) {
         return obtenerRol(salaId, usuarioId) == RolSala.LIDER;
     }
+
+    public void eliminarSala(Long salaId) {
+        miembrosPorSala.remove(salaId);
+    }
 }

@@ -1,7 +1,8 @@
 package com.orcalab.realtime.canal;
 
+import com.orcalab.realtime.chat.MensajeRepository;
 import com.orcalab.realtime.config.AuthContext;
-import com.orcalab.realtime.state.SalaEstadoService;
+import com.orcalab.realtime.room.RoomServiceClient;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -14,14 +15,17 @@ public class CanalService {
     public static final String NOMBRE_CANAL_POR_DEFECTO = "general";
 
     private final CanalRepository canalRepository;
-    private final SalaEstadoService salaEstadoService;
+    private final MensajeRepository mensajeRepository;
+    private final RoomServiceClient roomServiceClient;
     private final AuthContext authContext;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public CanalService(CanalRepository canalRepository, SalaEstadoService salaEstadoService,
-                         AuthContext authContext, SimpMessagingTemplate messagingTemplate) {
+    public CanalService(CanalRepository canalRepository, MensajeRepository mensajeRepository,
+                         RoomServiceClient roomServiceClient, AuthContext authContext,
+                         SimpMessagingTemplate messagingTemplate) {
         this.canalRepository = canalRepository;
-        this.salaEstadoService = salaEstadoService;
+        this.mensajeRepository = mensajeRepository;
+        this.roomServiceClient = roomServiceClient;
         this.authContext = authContext;
         this.messagingTemplate = messagingTemplate;
     }
@@ -33,7 +37,7 @@ public class CanalService {
     public Canal crear(Long salaId, CanalRequest request) {
         Long usuarioId = authContext.usuarioIdActual();
 
-        if (!salaEstadoService.esLider(salaId, usuarioId)) {
+        if (!roomServiceClient.esLider(salaId, usuarioId, authContext.tokenActual())) {
             throw new AccessDeniedException("Solo el líder de la sala puede crear canales");
         }
 
@@ -43,6 +47,29 @@ public class CanalService {
         messagingTemplate.convertAndSend("/topic/sala/" + salaId + "/canales", canal);
 
         return canal;
+    }
+
+    public void eliminar(Long salaId, String canalId) {
+        Long usuarioId = authContext.usuarioIdActual();
+
+        if (!roomServiceClient.esLider(salaId, usuarioId, authContext.tokenActual())) {
+            throw new AccessDeniedException("Solo el líder de la sala puede eliminar canales");
+        }
+
+        Canal canal = canalRepository.findById(canalId)
+                .filter(c -> c.getSalaId().equals(salaId))
+                .orElseThrow(() -> new IllegalArgumentException("Canal no encontrado"));
+
+        // Nunca se permite dejar la sala sin ningún canal (sin importar el nombre o tipo del
+        // último que quede) para que el chat nunca quede completamente huérfano.
+        if (canalRepository.findBySalaIdOrderByFechaCreacionAsc(salaId).size() <= 1) {
+            throw new IllegalArgumentException("No puedes eliminar el último canal de la sala");
+        }
+
+        canalRepository.delete(canal);
+        mensajeRepository.deleteByCanalId(canalId);
+
+        messagingTemplate.convertAndSend("/topic/sala/" + salaId + "/canales/eliminado", new CanalEliminadoMensaje(canalId));
     }
 
     /** Se invoca cuando se crea una sala, para que el chat tenga un canal de texto disponible desde el inicio. */

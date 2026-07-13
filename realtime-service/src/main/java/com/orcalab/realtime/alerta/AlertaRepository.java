@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface AlertaRepository extends MongoRepository<Alerta, String> {
     List<Alerta> findBySalaIdOrderByTimestampDesc(Long salaId);
+    void deleteBySalaId(Long salaId);
 }

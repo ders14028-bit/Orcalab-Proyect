@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface RutaRepository extends MongoRepository<Ruta, String> {
     List<Ruta> findBySalaId(Long salaId);
+    void deleteBySalaId(Long salaId);
 }

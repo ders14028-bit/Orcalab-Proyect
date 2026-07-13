@@ -3,6 +3,8 @@ package com.orcalab.realtime.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orcalab.realtime.canal.CanalService;
 import com.orcalab.realtime.model.RolSala;
+import com.orcalab.realtime.presence.PresenciaBroadcastService;
+import com.orcalab.realtime.sala.SalaLimpiezaService;
 import com.orcalab.realtime.state.SalaEstadoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ public class RoomEventConsumer {
     private final ObjectMapper objectMapper;
     private final SalaEstadoService salaEstadoService;
     private final CanalService canalService;
+    private final SalaLimpiezaService salaLimpiezaService;
+    private final PresenciaBroadcastService presenciaBroadcastService;
 
     @Value("${app.events.topic}")
     private String topic;
@@ -32,11 +36,14 @@ public class RoomEventConsumer {
     private String ultimoIdLeido = "0";
 
     public RoomEventConsumer(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper,
-                              SalaEstadoService salaEstadoService, CanalService canalService) {
+                              SalaEstadoService salaEstadoService, CanalService canalService,
+                              SalaLimpiezaService salaLimpiezaService, PresenciaBroadcastService presenciaBroadcastService) {
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
         this.salaEstadoService = salaEstadoService;
         this.canalService = canalService;
+        this.salaLimpiezaService = salaLimpiezaService;
+        this.presenciaBroadcastService = presenciaBroadcastService;
     }
 
     @Scheduled(fixedDelay = 1000)
@@ -74,11 +81,21 @@ public class RoomEventConsumer {
                 salaEstadoService.registrarSalaCreada(evento.getSalaId(), evento.getUsuarioId());
                 canalService.crearCanalPorDefectoSiNoExiste(evento.getSalaId(), evento.getUsuarioId());
             }
-            case "UsuarioSeUnioASala" -> salaEstadoService.registrarUsuarioUnido(
-                    evento.getSalaId(), evento.getUsuarioId(), RolSala.valueOf(evento.getRolEnSala()));
-            case "MiembroSalioDeSala" -> salaEstadoService.registrarMiembroSalio(evento.getSalaId(), evento.getUsuarioId());
-            case "RolDeMiembroCambiado" -> salaEstadoService.registrarCambioRol(
-                    evento.getSalaId(), evento.getUsuarioId(), RolSala.valueOf(evento.getRolEnSala()));
+            case "UsuarioSeUnioASala" -> {
+                salaEstadoService.registrarUsuarioUnido(
+                        evento.getSalaId(), evento.getUsuarioId(), RolSala.valueOf(evento.getRolEnSala()));
+                presenciaBroadcastService.difundirMiembroUnido(evento.getSalaId(), evento.getUsuarioId());
+            }
+            case "MiembroSalioDeSala" -> {
+                salaEstadoService.registrarMiembroSalio(evento.getSalaId(), evento.getUsuarioId());
+                presenciaBroadcastService.difundirMiembroSalio(evento.getSalaId(), evento.getUsuarioId());
+            }
+            case "RolDeMiembroCambiado" -> {
+                salaEstadoService.registrarCambioRol(
+                        evento.getSalaId(), evento.getUsuarioId(), RolSala.valueOf(evento.getRolEnSala()));
+                presenciaBroadcastService.difundirRolCambiado(evento.getSalaId(), evento.getUsuarioId());
+            }
+            case "SalaEliminada" -> salaLimpiezaService.limpiarDatosDeSala(evento.getSalaId());
             default -> log.warn("Tipo de evento desconocido: {}", evento.getTipo());
         }
         log.info("Evento aplicado: {} para sala {}", evento.getTipo(), evento.getSalaId());

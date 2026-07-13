@@ -138,6 +138,7 @@ services:
       MONGO_HOST: realtime-mongo
       MONGO_PORT: "27017"
       JWT_SECRET: *jwt-secret
+      ROOM_SERVICE_URL: http://room-service:8082
     ports:
       - "8083:8083"
     volumes:

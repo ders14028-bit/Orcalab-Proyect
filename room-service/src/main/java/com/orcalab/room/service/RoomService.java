@@ -150,6 +150,20 @@ public class RoomService {
         eventPublisher.publicar(SalaEvento.rolCambiado(salaId, usuarioIdObjetivo, nuevoRol.name()));
     }
 
+    @Transactional
+    public void eliminarSala(Long salaId) {
+        Long usuarioId = authContext.usuarioIdActual();
+        verificarEsLider(salaId, usuarioId);
+
+        Sala sala = salaRepository.findById(salaId)
+                .orElseThrow(() -> new IllegalArgumentException("Sala no encontrada"));
+
+        miembroRepository.deleteBySalaId(salaId);
+        salaRepository.delete(sala);
+
+        eventPublisher.publicar(SalaEvento.salaEliminada(salaId, usuarioId));
+    }
+
     private void verificarEsMiembro(Long salaId, Long usuarioId) {
         if (!miembroRepository.existsBySalaIdAndUsuarioId(salaId, usuarioId)) {
             throw new AccessDeniedException("No eres miembro de esta sala");

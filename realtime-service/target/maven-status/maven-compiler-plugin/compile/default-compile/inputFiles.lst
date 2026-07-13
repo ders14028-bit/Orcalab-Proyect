@@ -4,6 +4,7 @@ C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\mai
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\alerta\AlertaService.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\canal\Canal.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\canal\CanalController.java
+C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\canal\CanalEliminadoMensaje.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\canal\CanalRepository.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\canal\CanalRequest.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\canal\CanalService.java
@@ -39,10 +40,13 @@ C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\mai
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\mapa\RutaRepository.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\mapa\RutaRequest.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\model\RolSala.java
+C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\presence\PresenciaBroadcastService.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\presence\PresenciaController.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\presence\PresenciaMensaje.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\presence\PresenciaService.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\RealtimeServiceApplication.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\repository\package-info.java
+C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\room\RoomServiceClient.java
+C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\sala\SalaLimpiezaService.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\service\package-info.java
 C:\Users\ders1\OneDrive\Documentos\Orcalab\Orcalab-Back\realtime-service\src\main\java\com\orcalab\realtime\state\SalaEstadoService.java

@@ -35,5 +35,18 @@ public class PresenciaService {
         return presentesPorSala.getOrDefault(salaId, Set.of());
     }
 
+    /**
+     * Quita a un usuario de la lista de presentes sin pasar por una desconexión real de
+     * WebSocket — se usa cuando lo expulsan de la sala mientras su conexión sigue abierta,
+     * para que los demás dejen de verlo como conectado de inmediato. Si más tarde su socket
+     * se desconecta de verdad, registrarSalida() simplemente no encontrará nada que quitar.
+     */
+    public void forzarSalida(Long salaId, Long usuarioId) {
+        Set<Long> presentes = presentesPorSala.get(salaId);
+        if (presentes != null) {
+            presentes.remove(usuarioId);
+        }
+    }
+
     public record SesionInfo(Long salaId, Long usuarioId) {}
 }

@@ -28,6 +28,8 @@ app:
   security:
     jwt:
       secret: ${JWT_SECRET:orcalab-dev-secret-cambiar-en-produccion-minimo-256-bits-de-largo}
+  services:
+    room-service-url: ${ROOM_SERVICE_URL:http://localhost:8082}
 
 logging:
   file:

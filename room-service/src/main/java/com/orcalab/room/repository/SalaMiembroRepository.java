@@ -18,4 +18,6 @@ public interface SalaMiembroRepository extends JpaRepository<SalaMiembro, Long> 
     boolean existsBySalaIdAndUsuarioId(Long salaId, Long usuarioId);
 
     boolean existsBySalaIdAndUsuarioIdAndRolEnSala(Long salaId, Long usuarioId, RolSala rolEnSala);
+
+    void deleteBySalaId(Long salaId);
 }

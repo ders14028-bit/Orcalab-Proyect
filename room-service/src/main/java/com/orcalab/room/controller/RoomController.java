@@ -37,6 +37,12 @@ public class RoomController {
         return ResponseEntity.ok(roomService.obtenerSala(id));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarSala(@PathVariable Long id) {
+        roomService.eliminarSala(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/miembros")
     public ResponseEntity<List<MiembroResponse>> listarMiembros(@PathVariable Long id) {
         return ResponseEntity.ok(roomService.listarMiembros(id));

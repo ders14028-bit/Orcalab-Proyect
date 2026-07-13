@@ -8,4 +8,6 @@ public interface MensajeRepository extends MongoRepository<Mensaje, String> {
 
     List<Mensaje> findBySalaIdOrderByTimestampAsc(Long salaId);
     List<Mensaje> findByCanalIdOrderByTimestampAsc(String canalId);
+    void deleteBySalaId(Long salaId);
+    void deleteByCanalId(String canalId);
 }
