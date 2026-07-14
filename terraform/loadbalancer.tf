@@ -52,3 +52,19 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.kong.arn
   }
 }
+
+# Certificado autofirmado (ver variables.tf) importado a ACM. El navegador
+# mostrará advertencia de "no confiable" — ver README, sección de limitaciones,
+# para el paso manual de aceptarla una vez por navegador.
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = var.alb_certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.kong.arn
+  }
+}

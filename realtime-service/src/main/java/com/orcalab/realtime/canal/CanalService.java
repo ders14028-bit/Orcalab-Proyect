@@ -3,6 +3,7 @@ package com.orcalab.realtime.canal;
 import com.orcalab.realtime.chat.MensajeRepository;
 import com.orcalab.realtime.config.AuthContext;
 import com.orcalab.realtime.room.RoomServiceClient;
+import com.orcalab.realtime.voz.VozService;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -19,15 +20,17 @@ public class CanalService {
     private final RoomServiceClient roomServiceClient;
     private final AuthContext authContext;
     private final SimpMessagingTemplate messagingTemplate;
+    private final VozService vozService;
 
     public CanalService(CanalRepository canalRepository, MensajeRepository mensajeRepository,
                          RoomServiceClient roomServiceClient, AuthContext authContext,
-                         SimpMessagingTemplate messagingTemplate) {
+                         SimpMessagingTemplate messagingTemplate, VozService vozService) {
         this.canalRepository = canalRepository;
         this.mensajeRepository = mensajeRepository;
         this.roomServiceClient = roomServiceClient;
         this.authContext = authContext;
         this.messagingTemplate = messagingTemplate;
+        this.vozService = vozService;
     }
 
     public List<Canal> listar(Long salaId) {
@@ -68,6 +71,12 @@ public class CanalService {
 
         canalRepository.delete(canal);
         mensajeRepository.deleteByCanalId(canalId);
+        if (canal.getTipo() == TipoCanal.VOZ) {
+            // La desconexión real del cliente que está en la llamada la hace el front al recibir
+            // el broadcast de abajo (ver quitarCanalDelEstado en RoomSocketContext); esto solo
+            // limpia el estado de presencia en memoria para no dejar entradas huérfanas.
+            vozService.limpiarCanal(salaId, canalId);
+        }
 
         messagingTemplate.convertAndSend("/topic/sala/" + salaId + "/canales/eliminado", new CanalEliminadoMensaje(canalId));
     }

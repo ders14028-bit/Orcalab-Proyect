@@ -46,6 +46,11 @@ public class VozService {
         return participantesPorCanal.getOrDefault(new CanalVozKey(salaId, canalId), Map.of());
     }
 
+    /** Se invoca al eliminar un canal de voz, para no dejar entradas huérfanas en el mapa. */
+    public void limpiarCanal(Long salaId, String canalId) {
+        participantesPorCanal.remove(new CanalVozKey(salaId, canalId));
+    }
+
     private void quitarDeCanal(SesionVozInfo info) {
         Map<Long, Boolean> participantes = participantesPorCanal.get(new CanalVozKey(info.salaId(), info.canalId()));
         if (participantes != null) {

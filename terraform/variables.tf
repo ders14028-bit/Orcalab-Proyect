@@ -109,3 +109,19 @@ variable "asg_desired_capacity" {
   type    = number
   default = 1
 }
+
+# ---------------------------------------------------------------------------
+# HTTPS del ALB
+# ---------------------------------------------------------------------------
+# ACM está permitido en el Learner Lab, pero request-certificate (validación DNS)
+# y validación por email no son viables: DuckDNS no soporta el CNAME arbitrario
+# que ACM exige, y los correos de validación (admin@/webmaster@...) van a
+# duckdns.org, no a un buzón que controlemos. CloudFront (que daría HTTPS gratis
+# vía *.cloudfront.net sin nada de esto) está bloqueado por IAM en este lab.
+# Alternativa que sí funciona: certificado autofirmado importado directo a ACM
+# (acm:ImportCertificate no requiere validación de dominio), generado con
+# terraform/scripts/generate-alb-cert.sh. Ver limitación documentada en el README.
+variable "alb_certificate_arn" {
+  description = "ARN del certificado ACM (autofirmado, importado) para el listener HTTPS del ALB"
+  type        = string
+}

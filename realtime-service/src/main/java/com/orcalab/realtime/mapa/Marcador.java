@@ -13,6 +13,7 @@ public class Marcador {
 
     private Long salaId;
     private Long usuarioId; // quién lo creó o editó por última vez
+    private Long creadorId; // quién lo creó originalmente; nunca cambia (a diferencia de usuarioId), usado para permisos de borrado
     private double latitud;
     private double longitud;
     private String tipo; // ej: "AVISTAMIENTO", "ZONA_INTERES"
@@ -25,6 +26,7 @@ public class Marcador {
     public Marcador(Long salaId, Long usuarioId, double latitud, double longitud, String tipo, String descripcion) {
         this.salaId = salaId;
         this.usuarioId = usuarioId;
+        this.creadorId = usuarioId;
         this.latitud = latitud;
         this.longitud = longitud;
         this.tipo = tipo;
@@ -39,6 +41,9 @@ public class Marcador {
 
     public Long getUsuarioId() { return usuarioId; }
     public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
+
+    public Long getCreadorId() { return creadorId; }
+    public void setCreadorId(Long creadorId) { this.creadorId = creadorId; }
 
     public double getLatitud() { return latitud; }
     public void setLatitud(double latitud) { this.latitud = latitud; }

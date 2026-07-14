@@ -335,6 +335,39 @@ a todas las instancias para que cada una lo entregue a sus clientes locales.
 
 ---
 
+## Limitación conocida: HTTPS con certificado autofirmado (2 pasos manuales)
+
+**Por qué:** el canal de voz necesita `getUserMedia`, que los navegadores bloquean
+fuera de un "contexto seguro" (HTTPS). En este Learner Lab, ni `acm:RequestCertificate`
+(DuckDNS no soporta el CNAME arbitrario que ACM exige para validación DNS) ni la
+validación por email (los correos `admin@`/`webmaster@...` van a duckdns.org, no a
+nosotros) son viables, y CloudFront (que daría HTTPS gratis sin nada de esto vía
+`*.cloudfront.net`) está bloqueado por IAM. La alternativa que sí funciona:
+`acm:ImportCertificate` con un certificado **autofirmado** (no requiere validar
+dominio), generado con `terraform/scripts/generate-alb-cert.sh` y adjuntado al
+listener `:443` del ALB. El frontend se sirve desde el **endpoint REST de S3**
+(`https://orcalab-front-392517188231.s3.us-east-1.amazonaws.com/index.html`), que
+trae HTTPS gratis con certificado válido de AWS — no el endpoint de "website
+hosting" (ese es HTTP-only).
+
+Como consecuencia, **cualquier evaluador debe hacer 2 pasos manuales antes de usar
+la app**:
+
+1. **Aceptar el certificado autofirmado del backend, una vez por navegador:**
+   visitar directamente `https://orcalab-alb-1090154343.us-east-1.elb.amazonaws.com/`
+   y aceptar la advertencia de seguridad ("Avanzado" → "Continuar de todos modos").
+   Sin este paso, el frontend puede cargar pero todas las llamadas a la API y el
+   WebSocket fallarán en silencio (el navegador bloquea en segundo plano las
+   conexiones a un host con certificado no confiable hasta que el usuario lo
+   autoriza explícitamente).
+2. **No recargar la página (F5) estando dentro de una ruta profunda** como
+   `/salas/3`. El endpoint REST de S3 no tiene el "error document fallback" que sí
+   tiene el website hosting, así que una recarga en esa ruta devuelve un error de
+   S3 en vez de la app. Navegar solo con clics dentro de la SPA; para volver a
+   empezar, ir a `/index.html`.
+
+---
+
 ## 5. Decisiones de diseño relevantes
 
 - **Roles simplificados a 2 (Admin/Investigador) en vez de 4**, dado el enfoque educativo/institucional del proyecto (se descartaron "Público" y "Organización" del documento de Inception original).

@@ -29,7 +29,7 @@ output "front_bucket_name" {
 }
 
 output "alb_dns_name" {
-  description = "URL pública de OrcaLab (http://<este-dns>)"
+  description = "URL pública de OrcaLab (http:// o https://<este-dns> — ver README para el paso manual de aceptar el certificado autofirmado)"
   value       = aws_lb.main.dns_name
 }
 
