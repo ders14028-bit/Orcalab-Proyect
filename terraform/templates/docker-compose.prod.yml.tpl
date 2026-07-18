@@ -15,6 +15,8 @@ services:
       ADMIN_SEED_EMAIL: admin@orcalab.local
       ADMIN_SEED_PASSWORD: ${admin_seed_password}
       ADMIN_SEED_NOMBRE: Administrador OrcaLab
+    volumes:
+      - auth-service-logs:/app/logs
     networks: [orcalab-net]
 
   room-service:
@@ -29,6 +31,8 @@ services:
       REDIS_PORT: "6379"
       SPRING_DATA_REDIS_SSL_ENABLED: "true"
       JWT_SECRET: ${jwt_secret}
+    volumes:
+      - room-service-logs:/app/logs
     networks: [orcalab-net]
 
   realtime-service:
@@ -43,6 +47,8 @@ services:
       JWT_SECRET: ${jwt_secret}
       ROOM_SERVICE_URL: http://room-service:8082
       CORS_ALLOWED_ORIGINS: ${frontend_origin}
+    volumes:
+      - realtime-service-logs:/app/logs
     networks: [orcalab-net]
 
   reporting-service:
@@ -56,6 +62,19 @@ services:
       SPRING_DATA_REDIS_SSL_ENABLED: "true"
       JWT_SECRET: ${jwt_secret}
       ROOM_SERVICE_URL: http://room-service:8082
+      CORS_ALLOWED_ORIGINS: ${frontend_origin}
+    volumes:
+      - reporting-service-logs:/app/logs
+    networks: [orcalab-net]
+
+  # Clasificador de cetaceos (Python/FastAPI + ONNX). Sin volumen de logs:
+  # uvicorn escribe a stdout (docker logs), no a archivo como los Spring -
+  # por eso tampoco aparece en promtail-config.yml.
+  vision-service:
+    image: ${ecr_registry}/orcalab/vision-service:latest
+    container_name: vision-service
+    restart: unless-stopped
+    environment:
       CORS_ALLOWED_ORIGINS: ${frontend_origin}
     networks: [orcalab-net]
 
@@ -78,6 +97,7 @@ services:
       - room-service
       - realtime-service
       - reporting-service
+      - vision-service
     networks: [orcalab-net]
 
   # Unica entrada publica de la instancia: sirve el build de React y reenvia
@@ -95,6 +115,82 @@ services:
       - kong
     networks: [orcalab-net]
 
+  # ---------------------------------------------------------------------
+  # Observabilidad. Sin "ports" hacia 0.0.0.0: Prometheus/Grafana publican
+  # solo en loopback del host (127.0.0.1), alcanzables unicamente via SSM
+  # port-forward manual - nunca via el ALB ni el Security Group (ver README).
+  # Configs identicas a observability-service/, inyectadas por Terraform en
+  # /opt/orcalab/observability/ (ver user_data.sh.tpl); los nombres de
+  # servicio de este mismo compose son los targets de prometheus.yml.
+  # ---------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - /opt/orcalab/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "127.0.0.1:9090:9090"
+    depends_on:
+      - auth-service
+      - room-service
+      - realtime-service
+      - reporting-service
+    networks: [orcalab-net]
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki
+    restart: unless-stopped
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - /opt/orcalab/observability/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+    networks: [orcalab-net]
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail
+    restart: unless-stopped
+    command:
+      - -config.file=/etc/promtail/config.yml
+    volumes:
+      - /opt/orcalab/observability/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - auth-service-logs:/var/log/orcalab/auth-service/logs
+      - room-service-logs:/var/log/orcalab/room-service/logs
+      - realtime-service-logs:/var/log/orcalab/realtime-service/logs
+      - reporting-service-logs:/var/log/orcalab/reporting-service/logs
+    depends_on:
+      - loki
+    networks: [orcalab-net]
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${grafana_admin_password}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - /opt/orcalab/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+      - loki
+    networks: [orcalab-net]
+
 networks:
   orcalab-net:
     driver: bridge
+
+volumes:
+  auth-service-logs:
+  room-service-logs:
+  realtime-service-logs:
+  reporting-service-logs:
+  grafana-data:

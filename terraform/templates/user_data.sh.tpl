@@ -12,6 +12,16 @@ apt-get update -y
 apt-get install -y docker.io docker-compose-v2 postgresql-client awscli curl
 systemctl enable --now docker
 
+# --- 1b. Swap de 2GB: colchon ante picos de memoria (11 contenedores en 4GB;
+# sin esto un pico inesperado mata contenedores por OOM en vez de degradar) ---
+if [ ! -f /swapfile ]; then
+  fallocate -l 2G /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  echo '/swapfile none swap sw 0 0' >> /etc/fstab
+fi
+
 mkdir -p /opt/orcalab
 
 # --- 2. room_db en RDS (RDS solo crea auth_db; esto es idempotente) ----------
@@ -35,6 +45,28 @@ cat > /opt/orcalab/docker-compose.yml <<'COMPOSE_EOF'
 ${compose_config}
 COMPOSE_EOF
 chmod 600 /opt/orcalab/docker-compose.yml # contiene credenciales
+
+# --- 3b. Configs de observabilidad (identicas a observability-service/) -----
+mkdir -p /opt/orcalab/observability/prometheus
+mkdir -p /opt/orcalab/observability/loki
+mkdir -p /opt/orcalab/observability/promtail
+mkdir -p /opt/orcalab/observability/grafana/provisioning/datasources
+
+cat > /opt/orcalab/observability/prometheus/prometheus.yml <<'PROMETHEUS_EOF'
+${prometheus_config}
+PROMETHEUS_EOF
+
+cat > /opt/orcalab/observability/loki/loki-config.yml <<'LOKI_EOF'
+${loki_config}
+LOKI_EOF
+
+cat > /opt/orcalab/observability/promtail/promtail-config.yml <<'PROMTAIL_EOF'
+${promtail_config}
+PROMTAIL_EOF
+
+cat > /opt/orcalab/observability/grafana/provisioning/datasources/datasources.yml <<'GRAFANA_DS_EOF'
+${grafana_datasources_config}
+GRAFANA_DS_EOF
 
 # --- 4. Build del front (S3 staging privado, via LabInstanceProfile) ---------
 mkdir -p /opt/orcalab/front-dist

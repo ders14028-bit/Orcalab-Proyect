@@ -40,6 +40,11 @@ upstreams:
     targets:
       - target: reporting-service:8084
         weight: 100
+  - name: vision-service-upstream
+    algorithm: round-robin
+    targets:
+      - target: vision-service:8085
+        weight: 100
 
 services:
   - name: auth-service
@@ -103,6 +108,20 @@ services:
         paths:
           - /api/reportes
         strip_path: false
+
+  # vision-service (FastAPI) sirve /predict y /health en la raiz, no bajo
+  # /api/vision como mapean los controllers de Spring sus propios prefijos.
+  # Por eso esta es la unica ruta con strip_path: true:
+  #   /api/vision/predict -> /predict ; /api/vision/health -> /health
+  - name: vision-service
+    host: vision-service-upstream
+    port: 8085
+    protocol: http
+    routes:
+      - name: vision-service-route
+        paths:
+          - /api/vision
+        strip_path: true
 
   # Health check para el ALB: /health -> actuator de auth-service.
   # Valida que Kong este arriba Y que al menos un microservicio responda.

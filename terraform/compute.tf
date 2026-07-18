@@ -32,20 +32,25 @@ locals {
     mongo_username      = var.mongo_master_username
     mongo_password      = var.mongo_master_password
     jwt_secret          = var.jwt_secret
-    admin_seed_password = var.admin_seed_password
-    frontend_origin     = var.frontend_origin
+    admin_seed_password    = var.admin_seed_password
+    frontend_origin        = var.frontend_origin
+    grafana_admin_password = var.grafana_admin_password
   })
 
   user_data = templatefile("${path.module}/templates/user_data.sh.tpl", {
-    aws_region     = var.aws_region
-    ecr_registry   = local.ecr_registry
-    rds_endpoint   = aws_db_instance.postgres.address
-    db_username    = var.db_master_username
-    db_password    = var.db_master_password
-    kong_config    = file("${path.module}/../api-gateway/kong.yml")
-    nginx_config   = file("${path.module}/templates/nginx.conf.tpl")
-    compose_config = local.compose_config
-    front_bucket   = aws_s3_bucket.front.bucket
+    aws_region                 = var.aws_region
+    ecr_registry               = local.ecr_registry
+    rds_endpoint               = aws_db_instance.postgres.address
+    db_username                = var.db_master_username
+    db_password                = var.db_master_password
+    kong_config                = file("${path.module}/../api-gateway/kong.yml")
+    nginx_config               = file("${path.module}/templates/nginx.conf.tpl")
+    compose_config             = local.compose_config
+    front_bucket               = aws_s3_bucket.front.bucket
+    prometheus_config          = file("${path.module}/../observability-service/prometheus/prometheus.yml")
+    loki_config                = file("${path.module}/../observability-service/loki/loki-config.yml")
+    promtail_config            = file("${path.module}/../observability-service/promtail/promtail-config.yml")
+    grafana_datasources_config = file("${path.module}/../observability-service/grafana/provisioning/datasources/datasources.yml")
   })
 }
 
@@ -54,13 +59,28 @@ resource "aws_launch_template" "app" {
   image_id      = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
 
+  # Sin esto, el root queda en los 8GB default del AMI - insuficiente desde
+  # que la instancia baja 10 imagenes (5 propias + kong + nginx + Prometheus/
+  # Grafana/Loki/Promtail): el pull moria con "no space left on device".
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_size           = 24
+      volume_type           = "gp3"
+      delete_on_termination = true
+    }
+  }
+
   iam_instance_profile {
     name = data.aws_iam_instance_profile.lab.name # LabRole: pull de ECR + SSM para debug
   }
 
   vpc_security_group_ids = [aws_security_group.app.id]
 
-  user_data = base64encode(local.user_data)
+  # base64gzip (no base64encode): con las configs de observabilidad embebidas,
+  # el user_data plano supera el limite de 16KB de EC2. cloud-init de Ubuntu
+  # detecta y descomprime gzip transparentemente.
+  user_data = base64gzip(local.user_data)
 
   metadata_options {
     http_tokens = "required" # IMDSv2

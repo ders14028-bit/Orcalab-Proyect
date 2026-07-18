@@ -8,6 +8,7 @@ locals {
     "room-service",
     "realtime-service",
     "reporting-service",
+    "vision-service",
   ]
 }
 

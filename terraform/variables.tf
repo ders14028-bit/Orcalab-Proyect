@@ -81,6 +81,15 @@ variable "admin_seed_password" {
   default     = "OrcaAdmin123!"
 }
 
+# Sin default (a diferencia de admin_seed_password): Grafana solo es alcanzable
+# via SSM port-forward, pero sigue siendo un secreto real - debe vivir en
+# terraform.tfvars (gitignored), igual que db_master_password/jwt_secret.
+variable "grafana_admin_password" {
+  description = "Password del usuario admin de Grafana"
+  type        = string
+  sensitive   = true
+}
+
 # ---------------------------------------------------------------------------
 # Cómputo
 # ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-# Construye las 4 imagenes de OrcaLab y las sube a ECR.
+# Construye las 5 imagenes de OrcaLab y las sube a ECR.
 # Requisitos: Docker Desktop corriendo + credenciales AWS vigentes.
 # Uso:  .\build-and-push.ps1   (desde terraform/scripts, o desde donde sea)
 
@@ -16,7 +16,7 @@ Write-Host "Login a ECR $Registry..."
 cmd /c "aws ecr get-login-password --region $Region | docker login --username AWS --password-stdin $Registry"
 if ($LASTEXITCODE -ne 0) { throw "Fallo el login a ECR." }
 
-$services = @("auth-service", "room-service", "realtime-service", "reporting-service")
+$services = @("auth-service", "room-service", "realtime-service", "reporting-service", "vision-service")
 
 foreach ($svc in $services) {
     $image = "$Registry/orcalab/${svc}:latest"
@@ -28,4 +28,4 @@ foreach ($svc in $services) {
     if ($LASTEXITCODE -ne 0) { throw "Fallo el push de $svc." }
 }
 
-Write-Host "`nListo: las 4 imagenes estan en ECR." -ForegroundColor Green
+Write-Host "`nListo: las 5 imagenes estan en ECR." -ForegroundColor Green
