@@ -30,6 +30,8 @@ app:
       secret: ${JWT_SECRET:orcalab-dev-secret-cambiar-en-produccion-minimo-256-bits-de-largo}
   services:
     room-service-url: ${ROOM_SERVICE_URL:http://localhost:8082}
+    auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8081}
+    realtime-service-url: ${REALTIME_SERVICE_URL:http://localhost:8083}
   cors:
     # Lista separada por comas. Default: puerto por defecto de Vite, para dev local.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

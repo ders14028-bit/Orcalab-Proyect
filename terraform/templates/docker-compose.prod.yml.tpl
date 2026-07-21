@@ -62,6 +62,8 @@ services:
       SPRING_DATA_REDIS_SSL_ENABLED: "true"
       JWT_SECRET: ${jwt_secret}
       ROOM_SERVICE_URL: http://room-service:8082
+      AUTH_SERVICE_URL: http://auth-service:8081
+      REALTIME_SERVICE_URL: http://realtime-service:8083
       CORS_ALLOWED_ORIGINS: ${frontend_origin}
     volumes:
       - reporting-service-logs:/app/logs
