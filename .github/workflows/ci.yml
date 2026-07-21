@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # db_name/db_user/db_password quedan hardcodeados en el application.yml de cada
+          # servicio (solo host/puerto/usuario/password son overrideables via env var), asi que
+          # el Postgres del job tiene que levantar exactamente esa base+dueno para que la app
+          # conecte. realtime-service y reporting-service no usan Postgres (solo Mongo+Redis);
+          # les dejamos valores dummy porque el servicio postgres se levanta igual para los 4 -
+          # simplifica el workflow y el costo de un Postgres de mas es minimo.
+          - service: auth-service
+            db_name: auth_db
+            db_user: auth_user
+            db_password: auth_password
+          - service: room-service
+            db_name: room_db
+            db_user: room_user
+            db_password: room_password
+          - service: realtime-service
+            db_name: postgres
+            db_user: postgres
+            db_password: postgres
+          - service: reporting-service
+            db_name: postgres
+            db_user: postgres
+            db_password: postgres
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ${{ matrix.db_name }}
+          POSTGRES_USER: ${{ matrix.db_user }}
+          POSTGRES_PASSWORD: ${{ matrix.db_password }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ${{ matrix.db_user }}"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: ${{ matrix.service }}/pom.xml
+
+      - name: Run tests
+        run: mvn --batch-mode test
+        env:
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_USERNAME: ${{ matrix.db_user }}
+          DB_PASSWORD: ${{ matrix.db_password }}
+          REDIS_HOST: localhost
+          REDIS_PORT: "6379"
+          MONGO_HOST: localhost
+          MONGO_PORT: "27017"
