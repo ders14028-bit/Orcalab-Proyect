@@ -74,6 +74,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -94,3 +96,16 @@ jobs:
           REDIS_PORT: "6379"
           MONGO_HOST: localhost
           MONGO_PORT: "27017"
+
+      # Requiere los secrets SONAR_TOKEN y SONAR_ORGANIZATION en el repo de GitHub.
+      # Si no estan configurados, este step se salta y no rompe el resto del pipeline.
+      - name: SonarCloud Scan
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          mvn --batch-mode org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+          -Dsonar.projectKey=orcalab-${{ matrix.service }}
+          -Dsonar.host.url=https://sonarcloud.io
